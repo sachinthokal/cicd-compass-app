@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>CICD Compass | DevSecOps Mission Control</title>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="topbar">
+
+      <div class="brand">
+
+        <div class="brand-mark">
+          C
+        </div>
+
+        <div class="brand-text">
+          <h1>CICD Compass</h1>
+          <p>DevSecOps Mission Control</p>
+        </div>
+
+      </div>
+
+
+      <div class="header-status">
+
+        <span class="header-badge live">
+          PIPELINE OPERATIONAL
+        </span>
+
+        <span id="envBadge" class="header-badge">
+          ENV: LOADING
+        </span>
+
+        <span id="versionBadge" class="header-badge">
+          VER: --
+        </span>
+
+        <span class="header-badge live">
+          LIVE
+        </span>
+
+      </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN DASHBOARD
+    ====================================================== -->
+
+    <main class="dashboard">
+
+
+      <!-- ===================================================
+           SUMMARY
+      ==================================================== -->
+
+      <section class="summary-grid">
+
+
+        <!-- Hero -->
+
+        <div class="panel hero-card">
+
+          <div class="hero-copy">
+
+            <div class="eyebrow">
+              DELIVERY CONTROL CENTER
+            </div>
+
+            <h2>
+              CI/CD Pipeline Mission Control
+            </h2>
+
+            <p>
+              Continuous quality, security, build and deployment
+              validation across the software delivery lifecycle.
+            </p>
+
+          </div>
+
+
+          <div class="health-card">
+
+            <div class="health-ring">
+              <span>100%</span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- Quality -->
+
+        <div class="panel metric-card">
+
+          <div class="metric-top">
+
+            <span class="metric-label">
+              QUALITY GATES
+            </span>
+
+            <span class="metric-icon">
+              ✓
+            </span>
+
+          </div>
+
+          <div class="metric-value">
+            06
+          </div>
+
+          <div class="metric-sub">
+            ALL PASSED
+          </div>
+
+        </div>
+
+
+        <!-- Security -->
+
+        <div class="panel metric-card">
+
+          <div class="metric-top">
+
+            <span class="metric-label">
+              SECURITY
+            </span>
+
+            <span class="metric-icon">
+              ◈
+            </span>
+
+          </div>
+
+          <div class="metric-value">
+            PASS
+          </div>
+
+          <div class="metric-sub">
+            NO BLOCKERS
+          </div>
+
+        </div>
+
+
+        <!-- Delivery -->
+
+        <div class="panel metric-card">
+
+          <div class="metric-top">
+
+            <span class="metric-label">
+              DELIVERY
+            </span>
+
+            <span class="metric-icon">
+              →
+            </span>
+
+          </div>
+
+          <div class="metric-value">
+            READY
+          </div>
+
+          <div class="metric-sub">
+            PRODUCTION
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================
+           MAIN WORKSPACE
+      ==================================================== -->
+
+      <section class="workspace">
+
+
+        <!-- =================================================
+             PIPELINE
+        ================================================== -->
+
+        <section class="panel pipeline-panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <div class="eyebrow">
+                PIPELINE FLOW
+              </div>
+
+              <h2>
+                Delivery Stages
+              </h2>
+
+            </div>
+
+            <p>
+              6 / 6
+            </p>
+
+          </div>
+
+
+          <div class="pipeline-list">
+
+
+            <!-- Stage 1 -->
+
+            <div
+              class="stage-card active"
+              data-stage="stage-1">
+
+              <div class="stage-top">
+
+                <span class="stage-number">
+                  STAGE 01
+                </span>
+
+                <span class="stage-status">
+                  PASS
+                </span>
+
+              </div>
+
+              <div class="stage-main">
+
+                <h3>
+                  Code Quality & Testing
+                </h3>
+
+                <p>
+                  Linting, unit tests and coverage checks
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <!-- Stage 2 -->
+
+            <div
+              class="stage-card"
+              data-stage="stage-2">
+
+              <div class="stage-top">
+
+                <span class="stage-number">
+                  STAGE 02
+                </span>
+
+                <span class="stage-status">
+                  PASS
+                </span>
+
+              </div>
+
+              <div class="stage-main">
+
+                <h3>
+                  Security & Dependency Scanning
+                </h3>
+
+                <p>
+                  Secrets, source code and dependency checks
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <!-- Stage 3 -->
+
+            <div
+              class="stage-card"
+              data-stage="stage-3">
+
+              <div class="stage-top">
+
+                <span class="stage-number">
+                  STAGE 03
+                </span>
+
+                <span class="stage-status">
+                  PASS
+                </span>
+
+              </div>
+
+              <div class="stage-main">
+
+                <h3>
+                  Build & Container Security
+                </h3>
+
+                <p>
+                  Image build, scanning and SBOM
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <!-- Stage 4 -->
+
+            <div
+              class="stage-card"
+              data-stage="stage-4">
+
+              <div class="stage-top">
+
+                <span class="stage-number">
+                  STAGE 04
+                </span>
+
+                <span class="stage-status">
+                  PASS
+                </span>
+
+              </div>
+
+              <div class="stage-main">
+
+                <h3>
+                  Artifact Signing & Verification
+                </h3>
+
+                <p>
+                  Signing, provenance and integrity
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <!-- Stage 5 -->
+
+            <div
+              class="stage-card"
+              data-stage="stage-5">
+
+              <div class="stage-top">
+
+                <span class="stage-number">
+                  STAGE 05
+                </span>
+
+                <span class="stage-status">
+                  PASS
+                </span>
+
+              </div>
+
+              <div class="stage-main">
+
+                <h3>
+                  Deployment & Environment Validation
+                </h3>
+
+                <p>
+                  Deployment, smoke and health checks
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <!-- Stage 6 -->
+
+            <div
+              class="stage-card"
+              data-stage="stage-6">
+
+              <div class="stage-top">
+
+                <span class="stage-number">
+                  STAGE 06
+                </span>
+
+                <span class="stage-status">
+                  PASS
+                </span>
+
+              </div>
+
+              <div class="stage-main">
+
+                <h3>
+                  Production Release & Monitoring
+                </h3>
+
+                <p>
+                  Production release and monitoring
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- =================================================
+             INSPECTOR
+        ================================================== -->
+
+        <section class="panel inspector-panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <div class="eyebrow">
+                STAGE INSPECTOR
+              </div>
+
+              <p id="detailStageNum">
+                STAGE 01
+              </p>
+
+            </div>
+
+            <span class="header-badge">
+              DEVSECOPS GATE
+            </span>
+
+          </div>
+
+
+          <div class="inspector-content">
+
+            <h2 id="detailTitle">
+              Code Quality & Testing
+            </h2>
+
+            <p
+              id="detailDesc"
+              class="description">
+              Code quality, linting, unit tests and coverage
+              checks before the code moves forward.
+            </p>
+
+
+            <!-- Tools -->
+
+            <div class="inspector-block">
+
+              <div class="block-title">
+                TOOLS
+              </div>
+
+              <div
+                id="detailTools"
+                class="tool-list">
+              </div>
+
+            </div>
+
+
+            <!-- Rules -->
+
+            <div class="inspector-block">
+
+              <div class="block-title">
+                POLICY & RULES
+              </div>
+
+              <ul id="detailRules"></ul>
+
+            </div>
+
+
+            <!-- Failure -->
+
+            <div class="failure-box">
+
+              <span>
+                FAILURE TRIGGER
+              </span>
+
+              <strong id="detailFailure">
+                Lint, test or coverage gate failed
+              </strong>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- =================================================
+             TELEMETRY
+        ================================================== -->
+
+        <section class="panel telemetry-panel">
+
+          <div class="telemetry-header">
+
+            <div>
+
+              <div class="eyebrow">
+                LIVE TELEMETRY
+              </div>
+
+              <h2>
+                Application Runtime
+              </h2>
+
+            </div>
+
+            <span
+              id="endpointStatus"
+              class="endpoint-status">
+              API CONNECTED
+            </span>
+
+          </div>
+
+
+          <!-- Endpoint tabs -->
+
+          <div class="endpoint-tabs">
+
+            <button
+              class="tab-btn active"
+              data-url="/api/details">
+              Details
+            </button>
+
+            <button
+              class="tab-btn"
+              data-url="/api/health">
+              Health
+            </button>
+
+            <button
+              class="tab-btn"
+              data-url="/api/ready">
+              Ready
+            </button>
+
+            <button
+              id="refreshBtn"
+              class="refresh-btn"
+              type="button"
+              title="Refresh API">
+              ↻
+            </button>
+
+          </div>
+
+
+          <!-- API output -->
+
+          <div class="api-output">
+
+            <pre id="endpointOutput">Connecting...</pre>
+
+          </div>
+
+        </section>
+
+      </section>
+
+
+      <!-- ===================================================
+           RELEASE READINESS
+      ==================================================== -->
+
+      <section class="panel release-bar">
+
+        <div class="release-title">
+
+          <span>
+            RELEASE READINESS
+          </span>
+
+          <strong>
+            All delivery gates verified
+          </strong>
+
+        </div>
+
+
+        <div class="release-track">
+
+          <span
+            class="release-step done"
+            title="Quality">
+          </span>
+
+          <span
+            class="release-step done"
+            title="Security">
+          </span>
+
+          <span
+            class="release-step done"
+            title="Build">
+          </span>
+
+          <span
+            class="release-step done"
+            title="Signing">
+          </span>
+
+          <span
+            class="release-step done"
+            title="Deployment">
+          </span>
+
+          <span
+            class="release-step done"
+            title="Monitoring">
+          </span>
+
+        </div>
+
+      </section>
+
+    </main>
+
+
+  </div>
+
+
+  <script src="app.js"></script>
+
+</body>
+
+</html>
