@@ -76,14 +76,21 @@ jobs:
           docker version
           echo "::endgroup::"
 
+      - name: Get Application Version
+        id: version
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Build App Image for Local Testing
-        id: build-image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: false
           load: true
           tags: cicd-compass-app:local-test
+          build-args: |
+            VERSION=${{ steps.version.outputs.VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -123,8 +130,7 @@ jobs:
         run: |
           echo "::group::Docker Image & Version Information"
           IMAGE=${{ vars.DOCKERHUB_USERNAME }}/cicd-compass-app
-          VERSION_POM=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          VERSION="v${VERSION_POM}"
+          VERSION="v${{ steps.version.outputs.VERSION }}"
           GIT_SHA="sha-${GITHUB_SHA:0:7}"
           echo "::endgroup::"
 
@@ -159,4 +165,4 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           COSIGN_YES: "true"
-        run: cosign sign ${{ steps.push-image.outputs.DIGEST}}
+        run: cosign sign "${{ steps.push-image.outputs.DIGEST }}"

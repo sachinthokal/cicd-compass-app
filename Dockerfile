@@ -23,7 +23,7 @@ RUN addgroup -S appgroup \
     && adduser -S appuser -G appgroup \
     && chown -R appuser:appgroup /app
 
-ARG VERSION=1.0.0
+ARG VERSION
 
 COPY --chown=appuser:appgroup \
     --from=builder \
