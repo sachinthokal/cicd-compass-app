@@ -14,9 +14,9 @@ permissions:
 jobs:
 
   # -------------------------------------------------------------
-  # Job 1: Quality, Secret & Dependency Security Gates
+  # Job 1: Code Quality, Gitleaks Scan & Automated Test Case Execution
   # -------------------------------------------------------------
-  code-quality:
+  quality-scan:
     name: Code Quality & Security
     runs-on: ubuntu-latest
 
@@ -26,7 +26,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run Gitleaks Secret Scanner
+      - name: Gitleaks Secret Scanner
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -38,21 +38,21 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Verify Java and Maven
-        run: |
-          java -version
-          mvn -version
+      - name: Lint Code with Checkstyle
+        run: mvn checkstyle:check
 
-      - name: Build, Lint and Test
-        run: mvn clean verify
+      - name: Automated Test Case Execution
+        run: mvn test
 
   # -------------------------------------------------------------
-  # Job 2: Build, Security Scan, Push & Sign
+  # Job 2: Build, Image Scan, SBOM Generation & Push to Docker Hub
   # -------------------------------------------------------------
-  code-build:
-    name: Build, Scan, Push & Cosign Image
-    needs: code-quality
+  build-push:
+    name: Build, Scan & Report, Push
+    needs: [quality-scan]
     runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.push-image.outputs.DIGEST }}
 
     steps:
       - name: Checkout code
@@ -95,7 +95,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Run Trivy Vulnerability Scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         with:
           image-ref: cicd-compass-app:local-test
           format: 'table'
@@ -104,7 +104,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Generate SBOM
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         with:
           image-ref: cicd-compass-app:local-test
           format: 'spdx-json'
@@ -151,26 +151,34 @@ jobs:
           echo "Image digest: $DIGEST"
           echo "::endgroup::"
 
-          echo "IMAGE=$IMAGE" >> "$GITHUB_OUTPUT"
-          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "GIT_SHA=$GIT_SHA" >> "$GITHUB_OUTPUT"
-          echo "DIGEST=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_OUTPUT"       # sachinthokal/cicd-compass-app
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"   # v1.0.0
+          echo "GIT_SHA=$GIT_SHA" >> "$GITHUB_OUTPUT"   # sha-<first 7 characters of the commit SHA>
+          echo "DIGEST=$DIGEST" >> "$GITHUB_OUTPUT"     # Digest of the pushed image
 
+  # -------------------------------------------------------------
+  # Job 3: Sign and Verify Docker Image with Cosign
+  # -------------------------------------------------------------
+  image-cosign:
+    name: Cosign Docker Image
+    needs: [build-push]
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Install Cosign
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: sigstore/cosign-installer@v3
         
-
       - name: Sign the Published Docker Image
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           COSIGN_YES: "true"
-        run: cosign sign "${{ steps.push-image.outputs.DIGEST }}"
+        run: cosign sign "${{ needs.build-push.outputs.digest }}"
 
       - name: Verify the Signed Docker Image
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           cosign verify \
-            "${{ steps.push-image.outputs.DIGEST }}" \
+            "${{ needs.build-push.outputs.digest }}" \
             --certificate-identity-regexp='https://github.com/sachinthokal/cicd-compass-app/.github/workflows/cicd-compass-deployment.yaml@refs/heads/main' \
             --certificate-oidc-issuer='https://token.actions.githubusercontent.com'
