@@ -48,7 +48,7 @@ jobs:
   # Job 2: Build, Image Scan, SBOM Generation & Push to Docker Hub
   # -------------------------------------------------------------
   build-push:
-    name: Build, Scan & Report, Push
+    name: Build, Scan & Push
     needs: [quality-scan]
     runs-on: ubuntu-latest
     outputs:
@@ -160,7 +160,7 @@ jobs:
   # Job 3: Sign and Verify Docker Image with Cosign
   # -------------------------------------------------------------
   image-cosign:
-    name: Cosign Docker Image
+    name: Image Sign & Verify
     needs: [build-push]
     runs-on: ubuntu-latest
 
@@ -189,3 +189,29 @@ jobs:
             "${{ needs.build-push.outputs.digest }}" \
             --certificate-identity-regexp='https://github.com/sachinthokal/cicd-compass-app/.github/workflows/cicd-compass-deployment.yaml@refs/heads/main' \
             --certificate-oidc-issuer='https://token.actions.githubusercontent.com'
+
+  # -------------------------------------------------------------
+  # Job 4: Stage Deployment
+  # -------------------------------------------------------------
+  stage-deploy:
+    name: Stage Deployment
+    needs: [image-cosign]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Stage Deployment Placeholder
+        run: echo "Stage deployment steps would go here."
+
+
+  # -------------------------------------------------------------
+  # Job 5: Production Deployment
+  # -------------------------------------------------------------
+  prod-deploy:
+    name: Production Deployment
+    needs: [image-cosign, stage-deploy]
+    environment: production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Production Deployment Placeholder
+        run: echo "Production deployment steps would go here."
