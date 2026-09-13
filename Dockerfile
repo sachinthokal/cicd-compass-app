@@ -15,6 +15,8 @@ RUN mvn clean package -DskipTests
 # --- Stage 2: Run the application ---
 FROM eclipse-temurin:21-jre-alpine
 
+RUN apk update && apk upgrade
+
 WORKDIR /app
 
 RUN addgroup -S appgroup \
