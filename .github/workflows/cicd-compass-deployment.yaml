@@ -125,7 +125,7 @@ jobs:
           IMAGE=${{ vars.DOCKERHUB_USERNAME }}/cicd-compass-app
           VERSION_POM=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           VERSION="v${VERSION_POM}"
-          GIT_SHA="${GITHUB_SHA:0:7}"
+          GIT_SHA="sha-${GITHUB_SHA:0:7}"
           echo "::endgroup::"
 
           echo "::group::Docker Image Tagging"
