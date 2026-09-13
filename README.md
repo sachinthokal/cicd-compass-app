@@ -1,4 +1,4 @@
-# 🞭� CICD Compass
+# 🚀 CICD Compass
 
 > **Enterprise DevSecOps Architecture, Automated CI/CD Blueprints & Live Telemetry Engine**
 
