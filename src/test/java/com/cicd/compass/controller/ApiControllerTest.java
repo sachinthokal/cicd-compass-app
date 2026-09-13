@@ -1,46 +1,77 @@
 package com.cicd.compass.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+        .get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers
+        .jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers
+        .status;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+/**
+ * Tests for the ApiController REST endpoints.
+ */
 @WebMvcTest(ApiController.class)
-public class ApiControllerTest {
+@TestPropertySource(properties = {
+        "app.name=cicd-compass-app",
+        "app.version=v1.0.0",
+        "app.environment=test",
+        "app.region=ap-south-1",
+        "app.buildNumber=test"
+})
+class ApiControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    // 1. /api/health Test case
+    /**
+     * Tests the health endpoint.
+     *
+     * @throws Exception when the request fails
+     */
     @Test
-    public void testHealthEndpoint() throws Exception {
+    void testHealthEndpoint() throws Exception {
         mockMvc.perform(get("/api/health"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
 
-    // 2. /api/ready Test case
+    /**
+     * Tests the readiness endpoint.
+     *
+     * @throws Exception when the request fails
+     */
     @Test
-    public void testReadyEndpoint() throws Exception {
+    void testReadyEndpoint() throws Exception {
         mockMvc.perform(get("/api/ready"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("READY"))
-                .andExpect(jsonPath("$.service").exists())
+                .andExpect(jsonPath("$.service")
+                        .value("cicd-compass-app"))
                 .andExpect(jsonPath("$.acceptingTraffic").value(true));
     }
 
-    // 3. /api/details Test case
+    /**
+     * Tests the application details endpoint.
+     *
+     * @throws Exception when the request fails
+     */
     @Test
-    public void testDetailsEndpoint() throws Exception {
+    void testDetailsEndpoint() throws Exception {
         mockMvc.perform(get("/api/details"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.application").exists())
-                .andExpect(jsonPath("$.version").exists())
-                .andExpect(jsonPath("$.environment").exists())
+                .andExpect(jsonPath("$.application")
+                        .value("cicd-compass-app"))
+                .andExpect(jsonPath("$.version")
+                        .value("v1.0.0"))
+                .andExpect(jsonPath("$.environment")
+                        .value("test"))
                 .andExpect(jsonPath("$.javaVersion").exists())
                 .andExpect(jsonPath("$.memoryUsageMb").exists());
     }
