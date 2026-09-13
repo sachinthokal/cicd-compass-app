@@ -53,6 +53,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       digest: ${{ steps.push-image.outputs.DIGEST }}
+      image: ${{ steps.push-image.outputs.IMAGE }}
+      version: ${{ steps.push-image.outputs.VERSION }}
+      git_sha: ${{ steps.push-image.outputs.GIT_SHA }}
 
     steps:
       - name: Checkout code
@@ -84,6 +87,8 @@ jobs:
 
       - name: Build App Image for Local Testing
         uses: docker/build-push-action@v6
+        env:
+          DOCKER_BUILD_SUMMARY: false
         with:
           context: .
           push: false
@@ -215,3 +220,108 @@ jobs:
     steps:
       - name: Production Deployment Placeholder
         run: echo "Production deployment steps would go here."
+
+  
+  #-------------------------------------------------------------
+  # Job 6: CICD Pipeline Summary Report
+  # -------------------------------------------------------------
+  pipeline-summary:
+    name: CICD Pipeline Summary
+    if: always()
+    needs:
+      - quality-scan
+      - build-push
+      - image-cosign
+      - stage-deploy
+      - prod-deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate Pipeline Summary
+        env:
+          QUALITY_STATUS: ${{ needs.quality-scan.result }}
+          BUILD_STATUS: ${{ needs.build-push.result }}
+          COSIGN_STATUS: ${{ needs.image-cosign.result }}
+          STAGE_STATUS: ${{ needs.stage-deploy.result }}
+          PROD_STATUS: ${{ needs.prod-deploy.result }}
+
+          IMAGE: ${{ needs.build-push.outputs.image }}
+          VERSION: ${{ needs.build-push.outputs.version }}
+          GIT_SHA: ${{ needs.build-push.outputs.git_sha }}
+          DIGEST: ${{ needs.build-push.outputs.digest }}
+        run: |
+          if [[ "$QUALITY_STATUS" == "success" &&
+                "$BUILD_STATUS" == "success" &&
+                "$COSIGN_STATUS" == "success" &&
+                "$STAGE_STATUS" == "success" &&
+                "$PROD_STATUS" == "success" ]]; then
+            OVERALL_STATUS="🟢 SUCCESS"
+          else
+            OVERALL_STATUS="🔴 FAILED"
+          fi
+
+          echo "# 🚀 CICD Compass - Pipeline Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "## Overall Pipeline Status" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### $OVERALL_STATUS" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "## Pipeline Information" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Property | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Repository | \`${{ github.repository }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Branch | \`${{ github.ref_name }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Commit | \`${GITHUB_SHA:0:7}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Trigger | \`${{ github.event_name }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "## Docker Image Information" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Property | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Image | \`$IMAGE\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Version | \`$VERSION\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Git SHA | \`$GIT_SHA\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Digest | \`$DIGEST\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "## Stage Results" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Stage | Status |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Code Quality & Security | $QUALITY_STATUS |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Build, Scan & Push | $BUILD_STATUS |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Image Sign & Verify | $COSIGN_STATUS |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Stage Deployment | $STAGE_STATUS |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Production Deployment | $PROD_STATUS |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "## Deployment Pipeline" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          echo "Code" >> "$GITHUB_STEP_SUMMARY"
+          echo "  ↓" >> "$GITHUB_STEP_SUMMARY"
+          echo "Quality & Security" >> "$GITHUB_STEP_SUMMARY"
+          echo "  ↓" >> "$GITHUB_STEP_SUMMARY"
+          echo "Docker Build" >> "$GITHUB_STEP_SUMMARY"
+          echo "  ↓" >> "$GITHUB_STEP_SUMMARY"
+          echo "Trivy Scan" >> "$GITHUB_STEP_SUMMARY"
+          echo "  ↓" >> "$GITHUB_STEP_SUMMARY"
+          echo "SBOM Generation" >> "$GITHUB_STEP_SUMMARY"
+          echo "  ↓" >> "$GITHUB_STEP_SUMMARY"
+          echo "Docker Hub Push" >> "$GITHUB_STEP_SUMMARY"
+          echo "  ↓" >> "$GITHUB_STEP_SUMMARY"
+          echo "Cosign Sign & Verify" >> "$GITHUB_STEP_SUMMARY"
+          echo "  ↓" >> "$GITHUB_STEP_SUMMARY"
+          echo "Stage Deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "  ↓" >> "$GITHUB_STEP_SUMMARY"
+          echo "Production Deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "_Generated automatically by CICD Compass._" >> "$GITHUB_STEP_SUMMARY"
