@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
 
@@ -69,12 +70,22 @@ jobs:
       
       - name: Verify Java, Maven and Docker
         run: |
+          echo "::group::Java, Maven and Docker Version Information"
           java -version
           mvn -version
           docker version
+          echo "::endgroup::"
 
-      - name: Build App Image
-        run: docker build -t cicd-compass-app:local-test .
+      - name: Build App Image for Local Testing
+        id: build-image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: cicd-compass-app:local-test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Run Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@master
@@ -85,6 +96,20 @@ jobs:
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
 
+      - name: Generate SBOM
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: cicd-compass-app:local-test
+          format: 'spdx-json'
+          output: 'cicd-compass-sbom.spdx.json'
+
+      - name: Upload SBOM Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-report
+          path: cicd-compass-sbom.spdx.json
+          retention-days: 7
+
       - name: Log in to Docker Hub
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: docker/login-action@v3
@@ -92,9 +117,46 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Push App Image to Docker Hub
+      - name: Tag and Push Docker Image
+        id: push-image
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          docker tag cicd-compass-app:local-test \
-          ${{ vars.DOCKERHUB_USERNAME }}/cicd-compass-app:latest \
-          && docker push ${{ vars.DOCKERHUB_USERNAME }}/cicd-compass-app:latest
+          echo "::group::Docker Image & Version Information"
+          IMAGE=${{ vars.DOCKERHUB_USERNAME }}/cicd-compass-app
+          VERSION_POM=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          VERSION="v${VERSION_POM}"
+          GIT_SHA="${GITHUB_SHA:0:7}"
+          echo "::endgroup::"
+
+          echo "::group::Docker Image Tagging"
+          docker tag cicd-compass-app:local-test $IMAGE:latest
+          docker tag cicd-compass-app:local-test $IMAGE:${GIT_SHA}
+          docker tag cicd-compass-app:local-test $IMAGE:${VERSION}
+          echo "::endgroup::"
+          
+          echo "::group::Docker Image Pushing"
+          docker push $IMAGE:latest
+          docker push $IMAGE:${GIT_SHA}
+          docker push $IMAGE:${VERSION}
+          echo "::endgroup::"
+
+          echo "::group::Docker Image Digest Retrieval"
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE:$GIT_SHA)
+          echo "Image digest: $DIGEST"
+          echo "::endgroup::"
+
+          echo "IMAGE=$IMAGE" >> "$GITHUB_OUTPUT"
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "GIT_SHA=$GIT_SHA" >> "$GITHUB_OUTPUT"
+          echo "DIGEST=$DIGEST" >> "$GITHUB_OUTPUT"
+
+      - name: Install Cosign
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: sigstore/cosign-installer@v3
+        
+
+      - name: Sign the Published Docker Image
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        env:
+          COSIGN_YES: "true"
+        run: cosign sign ${{ steps.push-image.outputs.DIGEST}}
