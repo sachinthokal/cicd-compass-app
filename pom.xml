@@ -13,7 +13,6 @@
         <relativePath/>
     </parent>
 
-    # Project Metadata
     <groupId>com.cicd</groupId>
     <artifactId>cicd-compass-app</artifactId>
     <version>1.0.0</version>
