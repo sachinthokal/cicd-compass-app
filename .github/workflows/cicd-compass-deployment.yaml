@@ -83,6 +83,7 @@ jobs:
         id: version
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Application Version: $VERSION"
           echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build App Image for Local Testing
@@ -96,8 +97,7 @@ jobs:
           tags: cicd-compass-app:local-test
           build-args: |
             VERSION=${{ steps.version.outputs.VERSION }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          no-cache: true
 
       - name: Run Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
