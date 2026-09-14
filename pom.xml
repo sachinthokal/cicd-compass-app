@@ -15,7 +15,7 @@
 
     <groupId>com.cicd</groupId>
     <artifactId>cicd-compass-app</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.0</version>
     <name>cicd-compass-app</name>
     <description>Interactive DevSecOps and CI/CD Interactive Study Guide App</description>
 
