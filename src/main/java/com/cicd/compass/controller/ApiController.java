@@ -36,31 +36,31 @@ public final class ApiController {
     /**
      * Application name.
      */
-    @Value("${app.name:cicd-compass-app}")
+    @Value("${app.name}")
     private String appName;
 
     /**
      * Application version.
      */
-    @Value("${app.version:v1.0.0}")
+    @Value("${app.version}")
     private String appVersion;
 
     /**
      * Application environment.
      */
-    @Value("${app.environment:local}")
+    @Value("${app.environment}")
     private String environment;
 
     /**
      * Application region.
      */
-    @Value("${app.region:ap-south-1}")
+    @Value("${app.region}")
     private String region;
 
     /**
      * Application build number.
      */
-    @Value("${app.buildNumber:local-dev}")
+    @Value("${app.buildNumber}")
     private String buildNumber;
 
     /**
