@@ -196,10 +196,10 @@ jobs:
             --certificate-oidc-issuer='https://token.actions.githubusercontent.com'
 
   # -------------------------------------------------------------
-  # Job 4: Tag Deployment
+  # Job 4: Update Immutable Image Digest
   # -------------------------------------------------------------
-  tag-deploy:
-    name: Set Tag in ArgoCD Repository
+  update-gitops:
+    name: Update Image Digest in GitOps Repository
     needs: [build-push, image-cosign]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -213,24 +213,31 @@ jobs:
           path: argocd-for-devops
 
       - name: Configure Git User
+        working-directory: argocd-for-devops
         run: |
-          cd argocd-for-devops
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "actions@github.com"
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
 
       - name: Update Image Digest in Kubernetes Manifest
         working-directory: argocd-for-devops/cicd-compass-app
         run: |
           yq -i '.spec.template.spec.containers[0].image = "${{ needs.build-push.outputs.digest }}"' \
             02-cicd-compass-deployment.yaml
-        
-        
+
       - name: Commit and Push Changes
+        working-directory: argocd-for-devops
         run: |
-          cd cicd-compass-app
           git status
+
           git add cicd-compass-app/02-cicd-compass-deployment.yaml
-          git commit -m "chore(argocd): update image tag to ${{ needs.build-push.outputs.version }}"
+
+          if git diff --cached --quiet; then
+            echo "No GitOps changes detected."
+            exit 0
+          fi
+
+          git commit -m "chore(argocd): promote image ${{ needs.build-push.outputs.version }}"
+
           git push origin main
   
   
@@ -337,7 +344,7 @@ jobs:
           echo "| Code Quality & Security | $QUALITY_STATUS |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Build, Scan & Push | $BUILD_STATUS |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Image Sign & Verify | $COSIGN_STATUS |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| GitOps Tag Deployment | $TAG_STATUS |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| GitOps Manifest Update | $TAG_STATUS |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Stage Deployment | $STAGE_STATUS |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Production Deployment | $PROD_STATUS |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
