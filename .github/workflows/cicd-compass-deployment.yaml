@@ -224,6 +224,14 @@ jobs:
           yq -i '.spec.template.spec.containers[0].image = "${{ needs.build-push.outputs.digest }}"' \
             02-cicd-compass-deployment.yaml
 
+      - name: Update Multiple Values in ConfigMap
+        working-directory: argocd-for-devops/cicd-compass-app
+        run: |
+          yq -i '
+            .data.APP_VERSION = "${{ needs.build-push.outputs.version }}" |
+            .data.APP_BUILDNUMBER = "${{ needs.build-push.outputs.git_sha }}" |
+          ' 05-cicd-compass-configmap.yaml
+
       - name: Commit and Push Changes
         working-directory: argocd-for-devops
         run: |
