@@ -235,14 +235,14 @@ jobs:
         run: |
           git status
 
-          git add cicd-compass-app/02-cicd-compass-deployment.yaml
+          git add cicd-compass-app/02-cicd-compass-deployment.yaml cicd-compass-app/05-cicd-compass-configmap.yaml
 
           if git diff --cached --quiet; then
             echo "No GitOps changes detected."
             exit 0
           fi
 
-          git commit -m "chore(argocd): promote image ${{ needs.build-push.outputs.version }}"
+          git commit -m "chore : promote image and config for ${{ needs.build-push.outputs.version }}"
 
           git push origin main
   
