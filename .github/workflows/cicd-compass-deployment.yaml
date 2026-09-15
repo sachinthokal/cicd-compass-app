@@ -278,7 +278,7 @@ jobs:
       - quality-scan
       - build-push
       - image-cosign
-      - tag-deploy
+      - update-gitops
       - stage-deploy
       - prod-deploy
     runs-on: ubuntu-latest
