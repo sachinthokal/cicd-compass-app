@@ -212,6 +212,14 @@ jobs:
           token: ${{ secrets.ARGOCD_REPO_PAT }}
           path: cicd-compass-app
 
+      - name: Debug ArgoCD Repository Structure
+        run: |
+          pwd
+          echo "===================="
+          ls -la
+          echo "===================="
+          find cicd-compass-app -maxdepth 5 -type f | sort
+
       - name: Configure Git User
         run: |
           cd cicd-compass-app
