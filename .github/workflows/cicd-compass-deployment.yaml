@@ -210,36 +210,20 @@ jobs:
         with:
           repository: ${{ github.repository_owner }}/argocd-for-devops
           token: ${{ secrets.ARGOCD_REPO_PAT }}
-          path: cicd-compass-app
+          path: argocd-for-devops
 
-      - name: Debug ArgoCD Repository Structure
-        run: |
-          pwd
-          echo "===================="
-          ls -la
-          echo "===================="
-          find cicd-compass-app -maxdepth 5 -type f | sort
-
-      - name: Configure Git User
-        run: |
-          cd cicd-compass-app
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "actions@github.com"
-
-      - name: Update Image Digest in Kubernetes Manifest
-        working-directory: cicd-compass-app/cicd-compass-app
+      - name: Update Image Digest
+        working-directory: argocd-for-devops/cicd-compass-app
         run: |
           yq -i '.spec.template.spec.containers[0].image = "${{ needs.build-push.outputs.digest }}"' \
             02-cicd-compass-deployment.yaml
-        
 
-        
       - name: Commit and Push Changes
+        working-directory: argocd-for-devops
         run: |
-          cd cicd-compass-app
           git status
           git add cicd-compass-app/02-cicd-compass-deployment.yaml
-          git commit -m "chore(argocd): update image tag to ${{ needs.build-push.outputs.version }}"
+          git commit -m "chore(argocd): update image version to ${{ needs.build-push.outputs.version }}"
           git push origin main
   
   
