@@ -297,7 +297,7 @@ jobs:
           QUALITY_STATUS: ${{ needs.quality-scan.result }}
           BUILD_STATUS: ${{ needs.build-push.result }}
           COSIGN_STATUS: ${{ needs.image-cosign.result }}
-          TAG_STATUS: ${{ needs.tag-deploy.result }}
+          TAG_STATUS: ${{ needs.update-gitops.result }}
           STAGE_STATUS: ${{ needs.stage-deploy.result }}
           PROD_STATUS: ${{ needs.prod-deploy.result }}
 
