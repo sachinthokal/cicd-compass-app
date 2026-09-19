@@ -2,7 +2,7 @@
 
 
 /* =========================================================
-   ROOT
+   ROOT (Default / Blue Theme)
 ========================================================= */
 
 :root {
@@ -11,10 +11,15 @@
 
   --border: rgba(255, 255, 255, 0.08);
 
-  --blue: #38bdf8;
-  --cyan: #22d3ee;
-  --purple: #818cf8;
+  /* Dynamic Theme Variables (Default Blue/Cyan) */
+  --primary-blue: #38bdf8;
+  --primary-cyan: #22d3ee;
+  --hero-glow-color: rgba(56, 189, 248, 0.06);
+  --active-bg-1: rgba(56, 189, 248, 0.09);
+  --active-bg-2: rgba(56, 189, 248, 0.025);
+  --active-border: rgba(56, 189, 248, 0.35);
 
+  --purple: #818cf8;
   --green: #10b981;
   --amber: #f59e0b;
   --red: #ef4444;
@@ -29,6 +34,20 @@
   --shadow:
     0 20px 60px rgba(0, 0, 0, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+
+/* =========================================================
+   GREEN THEME OVERRIDE (For production-green)
+========================================================= */
+
+body.theme-green {
+  --primary-blue: #10b981;
+  --primary-cyan: #34d399;
+  --hero-glow-color: rgba(16, 185, 129, 0.06);
+  --active-bg-1: rgba(16, 185, 129, 0.09);
+  --active-bg-2: rgba(16, 185, 129, 0.025);
+  --active-border: rgba(16, 185, 129, 0.35);
 }
 
 
@@ -151,9 +170,9 @@ button,
       rgba(129, 140, 248, 0.12)
     );
 
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  border: 1px solid var(--active-border);
 
-  color: var(--cyan);
+  color: var(--primary-cyan);
 
   font-family: "JetBrains Mono", monospace;
 
@@ -161,7 +180,7 @@ button,
   font-weight: 600;
 
   box-shadow:
-    0 0 25px rgba(56, 189, 248, 0.08);
+    0 0 25px var(--hero-glow-color);
 }
 
 .brand-text {
@@ -335,7 +354,7 @@ button,
 
   border-radius: 50%;
 
-  background: rgba(56, 189, 248, 0.06);
+  background: var(--hero-glow-color);
 
   filter: blur(5px);
 
@@ -348,7 +367,7 @@ button,
 }
 
 .eyebrow {
-  color: var(--cyan);
+  color: var(--primary-cyan);
 
   font-family: "JetBrains Mono", monospace;
 
@@ -469,9 +488,9 @@ button,
 
   border-radius: 7px;
 
-  background: rgba(56, 189, 248, 0.08);
+  background: var(--hero-glow-color);
 
-  color: var(--cyan);
+  color: var(--primary-cyan);
 
   font-size: 12px;
 }
@@ -613,7 +632,7 @@ button,
 .stage-card:hover {
   background: rgba(255, 255, 255, 0.035);
 
-  border-color: rgba(56, 189, 248, 0.2);
+  border-color: var(--active-border);
 
   transform: translateY(-1px);
 }
@@ -622,14 +641,14 @@ button,
   background:
     linear-gradient(
       90deg,
-      rgba(56, 189, 248, 0.09),
-      rgba(56, 189, 248, 0.025)
+      var(--active-bg-1),
+      var(--active-bg-2)
     );
 
-  border-color: rgba(56, 189, 248, 0.35);
+  border-color: var(--active-border);
 
   box-shadow:
-    inset 3px 0 0 var(--blue),
+    inset 3px 0 0 var(--primary-blue),
     0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
@@ -642,7 +661,7 @@ button,
 }
 
 .stage-number {
-  color: var(--cyan);
+  color: var(--primary-cyan);
 
   font-family: "JetBrains Mono", monospace;
 
@@ -745,7 +764,7 @@ button,
 #detailStageNum {
   margin-top: 2px;
 
-  color: var(--cyan);
+  color: var(--primary-cyan);
 
   font-family: "JetBrains Mono", monospace;
 
@@ -846,7 +865,7 @@ button,
 }
 
 #detailRules li::marker {
-  color: var(--cyan);
+  color: var(--primary-cyan);
 }
 
 
@@ -988,15 +1007,15 @@ button,
 .tab-btn:hover {
   color: var(--text);
 
-  border-color: rgba(56, 189, 248, 0.22);
+  border-color: var(--active-border);
 }
 
 .tab-btn.active {
-  color: var(--cyan);
+  color: var(--primary-cyan);
 
-  background: rgba(56, 189, 248, 0.08);
+  background: var(--hero-glow-color);
 
-  border-color: rgba(56, 189, 248, 0.28);
+  border-color: var(--active-border);
 }
 
 
@@ -1034,11 +1053,11 @@ button,
 }
 
 .refresh-btn:hover {
-  color: var(--cyan);
+  color: var(--primary-cyan);
 
-  border-color: rgba(56, 189, 248, 0.25);
+  border-color: var(--active-border);
 
-  background: rgba(56, 189, 248, 0.06);
+  background: var(--hero-glow-color);
 }
 
 .refresh-btn:active {
@@ -1180,7 +1199,7 @@ pre {
 ========================================================= */
 
 ::selection {
-  background: rgba(56, 189, 248, 0.25);
+  background: var(--active-border);
 
   color: white;
 }
@@ -1462,4 +1481,23 @@ pre {
   pre {
     font-size: 10.5px;
   }
+}
+
+/* =========================================================
+   DYNAMIC ENVIRONMENT CARD BACKGROUNDS
+========================================================= */
+
+/* Default / Blue Environment Card Style (Ata thoda rich blue kelay) */
+#versionCard {
+  background: linear-gradient(145deg, rgba(56, 189, 248, 0.22), rgba(12, 18, 32, 0.95));
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 30px rgba(56, 189, 248, 0.15), var(--shadow);
+  transition: all 0.3s ease;
+}
+
+/* Green Environment Card Style */
+body.theme-green #versionCard {
+  background: linear-gradient(145deg, rgba(16, 185, 129, 0.22), rgba(12, 18, 32, 0.95));
+  border-color: rgba(16, 185, 129, 0.6);
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.2), var(--shadow);
 }

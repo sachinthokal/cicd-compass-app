@@ -441,11 +441,22 @@ function loadInitialDetails() {
         data.environment
       ) {
 
+        const envValue = String(data.environment).toLowerCase();
+
         envBadge.textContent =
           "ENV: " +
-          String(
-            data.environment
-          ).toUpperCase();
+          envValue.toUpperCase();
+
+        const bodyElement = document.body;
+
+        // Jar environment madhe 'green' asel tr green theme apply hoil, anyatha blue theme rahil
+        if (envValue.includes("green")) {
+          bodyElement.classList.remove("theme-blue");
+          bodyElement.classList.add("theme-green");
+        } else {
+          bodyElement.classList.remove("theme-green");
+          bodyElement.classList.add("theme-blue");
+        }
 
       }
 
