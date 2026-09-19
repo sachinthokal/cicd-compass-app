@@ -463,6 +463,16 @@ function loadInitialDetails() {
 
       }
 
+      /* Dashboard Metric Card Version (New Addition) */
+      const appVersionCardVal = document.getElementById("appVersionValue");
+      if (
+        appVersionCardVal &&
+        data.version
+      ) {
+        appVersionCardVal.textContent =
+          data.version;
+      }
+
 
       /* API output */
 
