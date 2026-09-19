@@ -224,7 +224,7 @@ jobs:
         working-directory: argocd-for-devops/cicd-compass-app
         run: |
           yq -i '.spec.template.spec.containers[0].image = "${{ needs.build-push.outputs.digest }}"' \
-            02-cicd-compass-deployment.yaml
+            04-cicd-compass-green-deployment.yaml
 
       - name: Update Multiple Values in ConfigMap
         working-directory: argocd-for-devops/cicd-compass-app
@@ -237,7 +237,7 @@ jobs:
         run: |
           git status
 
-          git add cicd-compass-app/02-cicd-compass-deployment.yaml cicd-compass-app/05-cicd-compass-configmap.yaml
+          git add cicd-compass-app/04-cicd-compass-green-deployment.yaml cicd-compass-app/05-cicd-compass-configmap.yaml
 
           if git diff --cached --quiet; then
             echo "No GitOps changes detected."
